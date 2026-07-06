@@ -41,30 +41,32 @@ export default async function ComicReaderPage({ params }: ComicReaderProps) {
   const pages = Array.from({ length: chapter.imageCount }, (_, index) => index + 1);
 
   return (
-    <main className="min-h-screen bg-slate-950 px-3 py-5 text-white sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[#07070a] px-3 py-4 text-white sm:px-6 lg:px-8">
       <article className="mx-auto max-w-4xl">
-        <header className="mb-5 rounded-lg border border-white/10 bg-white/10 p-4 backdrop-blur">
+        <header className="mb-4 border border-white/10 bg-white/[0.06] p-4 backdrop-blur">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <Link href={`/works/${work.slug}`} className="text-sm font-bold text-pink-200">
+            <Link href={`/works/${work.slug}`} className="text-sm font-black text-rose-300">
               返回详情
             </Link>
-            <Link href="/" className="text-sm font-semibold text-white/70 hover:text-white">
+            <Link href="/" className="text-sm font-bold text-white/70 hover:text-white">
               首页
             </Link>
           </div>
-          <p className="mt-4 text-sm font-bold text-pink-200">{work.title}</p>
-          <h1 className="mt-1 text-2xl font-black tracking-normal sm:text-3xl">
+          <p className="mt-4 text-xs font-black uppercase tracking-[0.22em] text-rose-300">
+            {work.title}
+          </p>
+          <h1 className="mt-1 text-2xl font-black tracking-normal text-white sm:text-3xl">
             {chapter.title}
           </h1>
         </header>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {pages.map((page) => (
             <div
               key={page}
-              className="relative mx-auto aspect-[3/4] max-w-3xl overflow-hidden rounded-lg border border-white/10 bg-gradient-to-br from-pink-300 via-violet-400 to-sky-300 p-3 shadow-2xl shadow-violet-950/60 sm:p-4"
+              className="relative mx-auto aspect-[3/4] max-w-3xl overflow-hidden border border-white/10 bg-gradient-to-br from-rose-300 via-violet-400 to-sky-300 p-2 shadow-2xl shadow-black/60 sm:p-3"
             >
-              <div className="grid h-full grid-rows-[1fr_0.8fr_1fr] gap-2 rounded-lg border border-white/45 bg-white/90 p-2 text-slate-950 sm:gap-3 sm:p-3">
+              <div className="grid h-full grid-rows-[1fr_0.8fr_1fr] gap-2 border border-white/45 bg-white p-2 text-slate-950 sm:gap-3 sm:p-3">
                 <div className="grid grid-cols-[1.2fr_0.8fr] gap-2 sm:gap-3">
                   <div className="relative overflow-hidden rounded border-2 border-slate-900 bg-gradient-to-br from-pink-100 to-white">
                     <div className="absolute left-4 top-4 rounded-full border-2 border-slate-900 bg-white px-3 py-1 text-xs font-black">
@@ -85,7 +87,7 @@ export default async function ComicReaderPage({ params }: ComicReaderProps) {
                   </div>
                 </div>
                 <div className="relative overflow-hidden rounded border-2 border-slate-900 bg-gradient-to-r from-violet-100 via-white to-pink-100">
-                  <div className="absolute left-5 top-4 text-4xl font-black italic text-fuchsia-500 drop-shadow-sm sm:text-6xl">
+                    <div className="absolute left-5 top-4 text-4xl font-black italic text-rose-500 drop-shadow-sm sm:text-6xl">
                     SHINE!
                   </div>
                   <div className="absolute inset-0 bg-[repeating-linear-gradient(105deg,transparent_0_12px,rgba(15,23,42,0.16)_13px_14px)]" />
@@ -110,7 +112,7 @@ export default async function ComicReaderPage({ params }: ComicReaderProps) {
                       P.{page}
                     </div>
                     <div className="absolute bottom-5 right-4 text-sm font-bold text-white/80">
-                      {work.coverMark}
+                      {work.coverStyle.mark}
                     </div>
                   </div>
                 </div>
@@ -119,34 +121,34 @@ export default async function ComicReaderPage({ params }: ComicReaderProps) {
           ))}
         </div>
 
-        <nav className="mt-6 grid gap-3 sm:grid-cols-3">
+        <nav className="mt-5 grid gap-3 sm:grid-cols-3">
           {previous ? (
             <Link
               href={getReadHref(work, previous.slug)}
-              className="rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-center text-sm font-bold text-white transition hover:bg-white/15"
+              className="rounded border border-white/15 bg-white/10 px-4 py-3 text-center text-sm font-black text-white transition hover:bg-white/15"
             >
               上一章
             </Link>
           ) : (
-            <span className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm font-bold text-white/30">
+            <span className="rounded border border-white/10 bg-white/5 px-4 py-3 text-center text-sm font-black text-white/30">
               上一章
             </span>
           )}
           <Link
             href={`/works/${work.slug}`}
-            className="rounded-lg bg-white px-4 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-pink-100"
+            className="rounded bg-white px-4 py-3 text-center text-sm font-black text-slate-950 transition hover:bg-rose-100"
           >
             章节目录
           </Link>
           {next ? (
             <Link
               href={getReadHref(work, next.slug)}
-              className="rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-center text-sm font-bold text-white transition hover:bg-white/15"
+              className="rounded border border-white/15 bg-white/10 px-4 py-3 text-center text-sm font-black text-white transition hover:bg-white/15"
             >
               下一章
             </Link>
           ) : (
-            <span className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm font-bold text-white/30">
+            <span className="rounded border border-white/10 bg-white/5 px-4 py-3 text-center text-sm font-black text-white/30">
               下一章
             </span>
           )}
