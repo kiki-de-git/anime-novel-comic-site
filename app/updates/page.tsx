@@ -2,10 +2,10 @@ import { PageHeading } from "@/app/components/PageHeading";
 import { SiteHeader } from "@/app/components/SiteHeader";
 import { UpdateRows } from "@/app/components/UpdateRows";
 import { getLatestWorks } from "@/app/lib/mock-data";
-import { getAllWorks } from "@/app/lib/work-data";
+import { getAllWorksForListing } from "@/app/lib/work-data";
 
 export default async function UpdatesPage() {
-  const works = await getAllWorks();
+  const works = await getAllWorksForListing();
   const latestWorks = getLatestWorks(works);
 
   return (

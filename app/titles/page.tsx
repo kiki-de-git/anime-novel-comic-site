@@ -2,10 +2,10 @@ import { Suspense } from "react";
 import { PageHeading } from "@/app/components/PageHeading";
 import { SiteHeader } from "@/app/components/SiteHeader";
 import { TitlesBrowser } from "@/app/components/TitlesBrowser";
-import { getAllWorks } from "@/app/lib/work-data";
+import { getAllWorksForListing } from "@/app/lib/work-data";
 
 export default async function TitlesPage() {
-  const works = await getAllWorks();
+  const works = await getAllWorksForListing();
 
   return (
     <main className="min-h-screen">

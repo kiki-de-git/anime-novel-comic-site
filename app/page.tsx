@@ -1,10 +1,10 @@
 import { HomePage } from "@/app/components/HomePage";
-import { getAllWorks } from "@/app/lib/work-data";
+import { getAllWorksForListing } from "@/app/lib/work-data";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
-  const works = await getAllWorks();
+  const works = await getAllWorksForListing();
 
   return <HomePage initialWorks={works} />;
 }

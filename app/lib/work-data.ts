@@ -91,6 +91,25 @@ export async function getAllWorks(): Promise<Work[]> {
   return sortByUpdatedAt((data as WorkRow[]).map(rowToWork));
 }
 
+export async function getAllWorksForListing(): Promise<Work[]> {
+  const works = await getAllWorks();
+
+  // Listing pages only need chapter metadata. Keeping full novel text out of
+  // their client payload prevents imported books from making the home page slow.
+  return works.map((work) => ({
+    ...work,
+    chapters: work.chapters.map((chapter) =>
+      chapter.imageCount === undefined
+        ? { slug: chapter.slug, title: chapter.title }
+        : {
+            slug: chapter.slug,
+            title: chapter.title,
+            imageCount: chapter.imageCount,
+          },
+    ),
+  }));
+}
+
 export async function getWorkBySlug(slug: string): Promise<Work | undefined> {
   const decodedSlug = decodeURIComponent(slug);
   const supabase = getSupabaseAdmin();

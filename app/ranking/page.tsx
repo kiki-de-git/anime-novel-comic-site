@@ -7,10 +7,10 @@ import {
   getRankingWorks,
   getReadHref,
 } from "@/app/lib/mock-data";
-import { getAllWorks } from "@/app/lib/work-data";
+import { getAllWorksForListing } from "@/app/lib/work-data";
 
 export default async function RankingPage() {
-  const works = await getAllWorks();
+  const works = await getAllWorksForListing();
   const rankingWorks = getRankingWorks(works);
 
   return (

@@ -2,10 +2,10 @@ import { PageHeading } from "@/app/components/PageHeading";
 import { SiteHeader } from "@/app/components/SiteHeader";
 import { WorkGrid } from "@/app/components/WorkGrid";
 import { getNewWorks } from "@/app/lib/mock-data";
-import { getAllWorks } from "@/app/lib/work-data";
+import { getAllWorksForListing } from "@/app/lib/work-data";
 
 export default async function NewPage() {
-  const works = await getAllWorks();
+  const works = await getAllWorksForListing();
   const newWorks = getNewWorks(works);
 
   return (
