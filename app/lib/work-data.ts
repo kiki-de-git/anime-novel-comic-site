@@ -65,6 +65,19 @@ function sortByUpdatedAt(sourceWorks: Work[]) {
   );
 }
 
+function getListingCoverStyle(work: Work): CoverStyle {
+  const image = work.coverStyle.image;
+
+  if (!image?.startsWith("data:")) {
+    return work.coverStyle;
+  }
+
+  return {
+    ...work.coverStyle,
+    image: `/api/covers/${encodeURIComponent(work.slug)}?v=${encodeURIComponent(work.updatedAt)}`,
+  };
+}
+
 export { isSupabaseConfigured };
 
 export async function getAllWorks(): Promise<Work[]> {
@@ -98,6 +111,7 @@ export async function getAllWorksForListing(): Promise<Work[]> {
   // their client payload prevents imported books from making the home page slow.
   return works.map((work) => ({
     ...work,
+    coverStyle: getListingCoverStyle(work),
     chapters: work.chapters.map((chapter) =>
       chapter.imageCount === undefined
         ? { slug: chapter.slug, title: chapter.title }
@@ -108,6 +122,28 @@ export async function getAllWorksForListing(): Promise<Work[]> {
           },
     ),
   }));
+}
+
+export async function getCoverImageBySlug(slug: string): Promise<string | undefined> {
+  const decodedSlug = decodeURIComponent(slug);
+  const supabase = getSupabaseAdmin();
+
+  if (!supabase) {
+    return mockWorks.find((work) => work.slug === decodedSlug)?.coverStyle.image;
+  }
+
+  const { data, error } = await supabase
+    .from("wave_works")
+    .select("cover_style")
+    .eq("slug", decodedSlug)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Failed to load cover image from Supabase:", error.message);
+    return undefined;
+  }
+
+  return (data as Pick<WorkRow, "cover_style"> | null)?.cover_style.image;
 }
 
 export async function getWorkBySlug(slug: string): Promise<Work | undefined> {
