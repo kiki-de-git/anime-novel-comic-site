@@ -12,6 +12,7 @@ export type CoverStyle = {
   via: string;
   to: string;
   mark: string;
+  image?: string;
 };
 
 export type Work = {
@@ -459,18 +460,20 @@ export function getReadHref(work: Work, chapterSlug = work.chapters[0]?.slug) {
   return `/read/${work.type}/${work.slug}/${chapterSlug}`;
 }
 
-export function getLatestWorks() {
-  return [...works].sort(
+export function getLatestWorks(sourceWorks = works) {
+  return [...sourceWorks].sort(
     (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
   );
 }
 
-export function getRankingWorks() {
-  return [...works].sort((a, b) => b.popularity - a.popularity);
+export function getRankingWorks(sourceWorks = works) {
+  return [...sourceWorks].sort((a, b) => b.popularity - a.popularity);
 }
 
-export function getNewWorks() {
-  return getLatestWorks().filter((work) => work.section === "new").slice(0, 12);
+export function getNewWorks(sourceWorks = works) {
+  return getLatestWorks(sourceWorks)
+    .filter((work) => work.section === "new")
+    .slice(0, 12);
 }
 
 export function formatPopularity(value: number) {

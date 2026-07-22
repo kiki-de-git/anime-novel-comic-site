@@ -4,15 +4,18 @@ import {
   getChapter,
   getChapterNeighbors,
   getReadHref,
-  getWork,
-  works,
 } from "@/app/lib/mock-data";
+import { getAllWorks, getWorkBySlug } from "@/app/lib/work-data";
 
 type NovelReaderProps = {
   params: Promise<{ slug: string; chapter: string }>;
 };
 
-export function generateStaticParams() {
+export const dynamic = "force-dynamic";
+
+export async function generateStaticParams() {
+  const works = await getAllWorks();
+
   return works
     .filter((work) => work.type === "novel")
     .flatMap((work) =>
@@ -25,7 +28,7 @@ export function generateStaticParams() {
 
 export default async function NovelReaderPage({ params }: NovelReaderProps) {
   const { slug, chapter: chapterSlug } = await params;
-  const work = getWork(slug);
+  const work = await getWorkBySlug(slug);
 
   if (!work || work.type !== "novel") {
     notFound();

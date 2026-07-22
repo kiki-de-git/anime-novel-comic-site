@@ -1,12 +1,49 @@
 import Link from "next/link";
 import { CoverArt } from "@/app/components/CoverArt";
-import { getReadHref, type Work } from "@/app/lib/mock-data";
+import { formatPopularity, getReadHref, type Work } from "@/app/lib/mock-data";
 
 type WorkCardProps = {
   work: Work;
+  variant?: "default" | "platform";
 };
 
-export function WorkCard({ work }: WorkCardProps) {
+function formatUpdateDate(date: string) {
+  const value = new Date(date);
+
+  if (Number.isNaN(value.getTime())) {
+    return "最新";
+  }
+
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+
+  return `${value.getMonth() + 1}.${value.getDate()} 星期${weekdays[value.getDay()]}`;
+}
+
+export function WorkCard({ work, variant = "default" }: WorkCardProps) {
+  if (variant === "platform") {
+    return (
+      <article className="group min-w-0">
+        <Link href={`/works/${work.slug}`} className="block">
+          <div className="relative overflow-hidden rounded-lg">
+            <CoverArt work={work} compact showTitleOverlay={false} />
+            <span className="absolute left-0 top-0 rounded-br-md bg-black/55 px-3 py-2 text-sm font-black leading-tight text-white backdrop-blur-sm">
+              {formatUpdateDate(work.updatedAt)}
+            </span>
+          </div>
+        </Link>
+        <Link href={`/works/${work.slug}`}>
+          <h3 className="mt-3 line-clamp-2 min-h-14 text-xl font-black leading-7 text-white transition group-hover:text-rose-300">
+            {work.title}
+          </h3>
+        </Link>
+        <p className="text-lg font-black text-white">
+          #{work.chapters.length.toString().padStart(3, "0")}{" "}
+          <span className="text-slate-400">{formatPopularity(work.popularity)}</span>
+        </p>
+      </article>
+    );
+  }
+
   return (
     <article className="group overflow-hidden bg-[#141414] transition hover:-translate-y-0.5">
       <Link href={`/works/${work.slug}`} className="block">
@@ -15,7 +52,7 @@ export function WorkCard({ work }: WorkCardProps) {
       <div className="space-y-2 px-0 pt-3">
         <div>
           <div className="mb-1 flex items-center justify-between gap-2 text-[11px] font-black uppercase text-slate-500">
-            <span>{work.type === "novel" ? "Novel" : "Manga"}</span>
+            <span>{work.type === "novel" ? "Novel" : "Comic"}</span>
             <span className="bg-rose-500 px-1.5 py-1 text-white">
               {work.status}
             </span>

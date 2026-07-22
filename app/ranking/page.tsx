@@ -7,12 +7,14 @@ import {
   getRankingWorks,
   getReadHref,
 } from "@/app/lib/mock-data";
+import { getAllWorks } from "@/app/lib/work-data";
 
-export default function RankingPage() {
-  const rankingWorks = getRankingWorks();
+export default async function RankingPage() {
+  const works = await getAllWorks();
+  const rankingWorks = getRankingWorks(works);
 
   return (
-    <main className="min-h-screen bg-[#07070a]">
+    <main className="min-h-screen bg-transparent">
       <SiteHeader />
       <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
         <PageHeading

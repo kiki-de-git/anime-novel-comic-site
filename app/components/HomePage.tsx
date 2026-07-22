@@ -1,11 +1,16 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { CoverArt } from "@/app/components/CoverArt";
 import { SiteHeader } from "@/app/components/SiteHeader";
 import { WorkGrid } from "@/app/components/WorkGrid";
-import { getLatestWorks, getReadHref, works, type Work } from "@/app/lib/mock-data";
+import {
+  formatPopularity,
+  getLatestWorks,
+  works as fallbackWorks,
+  type Work,
+} from "@/app/lib/mock-data";
 
 function Section({
   id,
@@ -33,114 +38,148 @@ function Section({
           {sectionWorks.length} 部
         </span>
       </div>
-      <WorkGrid works={sectionWorks} />
+      <WorkGrid works={sectionWorks} variant="platform" />
+    </section>
+  );
+}
+function UpdateStripCard({ work }: { work: Work }) {
+  return (
+    <Link href={`/works/${work.slug}`} className="group block min-w-0">
+      <div className="relative overflow-hidden rounded-md">
+        <CoverArt work={work} compact showTitleOverlay={false} />
+        <span className="absolute left-0 top-0 rounded-br bg-rose-500 px-2 py-1 text-[11px] font-black text-white">
+          最新24小时
+        </span>
+      </div>
+      <h3 className="mt-2 line-clamp-2 min-h-12 text-lg font-black leading-6 text-white group-hover:text-rose-300">
+        {work.title}
+      </h3>
+      <p className="text-sm font-bold text-slate-400">
+        #{work.chapters.length.toString().padStart(3, "0")}{" "}
+        {formatPopularity(work.popularity)}
+      </p>
+    </Link>
+  );
+}
+
+function FeaturedBanner({ work }: { work: Work }) {
+  const hasImage = Boolean(work.coverStyle.image);
+  const visualStyle = hasImage
+    ? { backgroundImage: `url("${work.coverStyle.image}")` }
+    : {
+        backgroundImage: `linear-gradient(135deg, ${work.coverStyle.from}, ${work.coverStyle.via} 46%, ${work.coverStyle.to})`,
+      };
+
+  return (
+    <section className="relative overflow-hidden rounded-[2rem] border border-white/15 bg-black/45 shadow-2xl shadow-black/45">
+      <div className="grid min-h-[310px] md:grid-cols-[37%_63%] lg:min-h-[390px]">
+        <Link
+          href={`/works/${work.slug}`}
+          className="relative z-10 flex flex-col justify-center bg-black/72 px-7 py-8 text-white md:px-9 lg:px-12"
+        >
+          <span className="mb-5 w-fit rounded-br-xl rounded-tl-xl bg-rose-500 px-4 py-2 text-sm font-black">
+            人气最高
+          </span>
+          <h1 className="text-3xl font-black leading-tight sm:text-4xl">
+            {work.title}
+          </h1>
+          <p className="mt-2 text-lg font-bold text-slate-200">{work.author}</p>
+          <p className="mt-8 text-xl font-black">
+            #{work.chapters.length.toString().padStart(3, "0")}{" "}
+            <span className="text-slate-300">{formatPopularity(work.popularity)}</span>
+          </p>
+        </Link>
+
+        <Link
+          href={`/works/${work.slug}`}
+          className="relative min-h-[280px] overflow-hidden bg-cover bg-center md:min-h-full"
+          style={visualStyle}
+          aria-label={`查看 ${work.title} 详情`}
+        >
+          {!hasImage ? (
+            <>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_68%_30%,rgba(255,255,255,0.45),transparent_22%),linear-gradient(90deg,rgba(0,0,0,0.28),transparent_45%)]" />
+              <div className="absolute bottom-5 left-8 right-8 text-[3.2rem] font-black uppercase leading-none text-white/85 drop-shadow-2xl sm:text-[4.8rem] lg:text-[6rem]">
+                {work.coverStyle.mark}
+              </div>
+            </>
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-black/10" />
+          )}
+          <span className="absolute right-5 top-5 grid h-11 w-11 place-items-center rounded-full bg-white/25 text-lg font-black text-white backdrop-blur">
+            ⌕
+          </span>
+        </Link>
+      </div>
     </section>
   );
 }
 
-function UpdateList({ items }: { items: Work[] }) {
-  return (
-    <aside className="border border-slate-200 bg-white">
-      <div className="border-b border-slate-200 px-4 py-3">
-        <p className="text-xs font-black uppercase tracking-[0.22em] text-rose-500">
-          Latest Updates
-        </p>
-        <h2 className="mt-1 text-xl font-black text-slate-950">今日更新</h2>
-      </div>
-      <div className="divide-y divide-slate-100">
-        {items.map((work, index) => (
-          <Link
-            key={work.slug}
-            href={getReadHref(work)}
-            className="grid grid-cols-[2rem_1fr_auto] items-center gap-3 px-4 py-3 transition hover:bg-rose-50"
-          >
-            <span className="text-lg font-black text-slate-300">
-              {String(index + 1).padStart(2, "0")}
-            </span>
-            <span className="min-w-0">
-              <span className="block truncate text-sm font-black text-slate-950">
-                {work.title}
-              </span>
-              <span className="mt-0.5 block text-xs font-semibold text-slate-500">
-                最新章节 · {work.status}
-              </span>
-            </span>
-            <span className="rounded bg-slate-950 px-2 py-1 text-xs font-black text-white">
-              READ
-            </span>
-          </Link>
-        ))}
-      </div>
-    </aside>
-  );
+function getFeaturedWork(sourceWorks: Work[]) {
+  const sortedNovels = sourceWorks
+    .filter((work) => work.type === "novel")
+    .sort((a, b) => b.popularity - a.popularity);
+  const sortedWorks = [...sourceWorks].sort((a, b) => b.popularity - a.popularity);
+
+  return sortedNovels[0] ?? sortedWorks[0];
 }
 
-export function HomePage() {
+export function HomePage({ initialWorks }: { initialWorks: Work[] }) {
   const [query, setQuery] = useState("");
+  const allWorks = initialWorks.length > 0 ? initialWorks : fallbackWorks;
+  const featuredWork = getFeaturedWork(allWorks);
 
   const normalizedQuery = query.trim().toLowerCase();
   const filteredWorks = useMemo(() => {
     if (!normalizedQuery) {
-      return works;
+      return allWorks;
     }
 
-    return works.filter((work) =>
+    return allWorks.filter((work) =>
       work.title.toLowerCase().includes(normalizedQuery),
     );
-  }, [normalizedQuery]);
+  }, [allWorks, normalizedQuery]);
 
-  const popularNovels = filteredWorks.filter(
+  const listWorks =
+    normalizedQuery || !featuredWork
+      ? filteredWorks
+      : filteredWorks.filter((work) => work.slug !== featuredWork.slug);
+  const popularNovels = listWorks.filter(
     (work) => work.section === "popular-novel",
   );
-  const popularComics = filteredWorks.filter(
+  const popularComics = listWorks.filter(
     (work) => work.section === "popular-comic",
   );
-  const newWorks = filteredWorks.filter((work) => work.section === "new");
-  const featuredWork = works.find((work) => work.type === "comic") ?? works[0];
-  const latestWorks = getLatestWorks().slice(0, 6);
+  const newWorks = listWorks.filter((work) => work.section === "new");
+  const latestWorks = getLatestWorks(allWorks);
+  const latestStripWorks = featuredWork
+    ? latestWorks.filter((work) => work.slug !== featuredWork.slug)
+    : latestWorks;
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#07070a] text-slate-950">
+    <main className="min-h-screen overflow-hidden bg-[#1f1f1f] text-slate-950">
       <SiteHeader searchValue={query} onSearchChange={setQuery} />
 
-      <section className="border-b border-white/10 bg-[#07070a]">
-        <div className="mx-auto grid max-w-7xl gap-4 px-4 py-5 sm:px-6 lg:grid-cols-[1fr_360px] lg:px-8 lg:py-8">
-          <div className="grid gap-4 border border-slate-200 bg-[#111827] p-4 text-white sm:grid-cols-[220px_1fr] lg:p-5">
-            <div className="max-w-48 sm:max-w-none">
-              <CoverArt work={featuredWork} />
-            </div>
-            <div className="flex flex-col justify-center">
-              <p className="mb-3 w-fit bg-rose-500 px-3 py-1 text-xs font-black uppercase tracking-[0.18em]">
-                Featured Series
-              </p>
-              <h1 className="max-w-2xl text-4xl font-black leading-tight tracking-normal sm:text-5xl">
-                每天打开一话，进入新的漫画宇宙
-              </h1>
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
-                收录原创轻小说与漫画作品，快速查看更新、进入章节、开始阅读。
-                这是 YumeVerse 的原创漫画平台风第一版。
-              </p>
-              <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-                <Link
-                  href={`/works/${featuredWork.slug}`}
-                  className="rounded bg-white px-5 py-3 text-center text-sm font-black text-slate-950 transition hover:bg-rose-100"
-                >
-                  查看主推作品
-                </Link>
-                <Link
-                  href={getReadHref(featuredWork)}
-                  className="rounded border border-white/25 px-5 py-3 text-center text-sm font-black text-white transition hover:bg-white/10"
-                >
-                  立即阅读
-                </Link>
-              </div>
-            </div>
+      <section className="relative overflow-hidden border-b border-white/10 bg-[#1f1f1f]">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-30"
+          style={{ backgroundImage: "url('/wave-hero-background.jpg')" }}
+          aria-hidden="true"
+        />
+        <div className="absolute inset-0 bg-black/45" aria-hidden="true" />
+
+        <div className="relative mx-auto max-w-[1840px] px-4 py-7 sm:px-6 lg:px-10">
+          {featuredWork ? <FeaturedBanner work={featuredWork} /> : null}
+
+          <div className="mt-7 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            {latestStripWorks.slice(0, 5).map((work) => (
+              <UpdateStripCard key={work.slug} work={work} />
+            ))}
           </div>
-          <UpdateList items={latestWorks} />
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl space-y-10 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1840px] space-y-10 px-4 py-8 sm:px-6 lg:px-10">
         <div id="popular" className="scroll-mt-28 space-y-10">
           <Section
             id="novels"

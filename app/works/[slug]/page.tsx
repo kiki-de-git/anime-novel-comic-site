@@ -1,14 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CommentsSection } from "@/app/components/CommentsSection";
 import { CoverArt } from "@/app/components/CoverArt";
-import { getReadHref, getWork, works } from "@/app/lib/mock-data";
+import { getReadHref } from "@/app/lib/mock-data";
+import { getAllWorks, getWorkBySlug } from "@/app/lib/work-data";
 
 type WorkPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
+export const dynamic = "force-dynamic";
+
+export async function generateStaticParams() {
+  const works = await getAllWorks();
+
   return works.map((work) => ({
     slug: work.slug,
   }));
@@ -18,23 +24,23 @@ export async function generateMetadata({
   params,
 }: WorkPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const work = getWork(slug);
+  const work = await getWorkBySlug(slug);
 
   if (!work) {
     return {
-      title: "作品不存在 | YumeVerse",
+      title: "作品不存在 | WAVE",
     };
   }
 
   return {
-    title: `${work.title} | YumeVerse`,
+    title: `${work.title} | WAVE`,
     description: work.description,
   };
 }
 
 export default async function WorkPage({ params }: WorkPageProps) {
   const { slug } = await params;
-  const work = getWork(slug);
+  const work = await getWorkBySlug(slug);
 
   if (!work) {
     notFound();
@@ -139,6 +145,8 @@ export default async function WorkPage({ params }: WorkPageProps) {
             ))}
           </div>
         </section>
+
+        <CommentsSection workSlug={work.slug} />
       </div>
     </main>
   );

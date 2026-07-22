@@ -4,11 +4,13 @@ import type { Work } from "@/app/lib/mock-data";
 type WorkGridProps = {
   works: Work[];
   emptyText?: string;
+  variant?: "default" | "platform";
 };
 
 export function WorkGrid({
   works,
   emptyText = "没有找到相关作品，试试换个关键词吧。",
+  variant = "default",
 }: WorkGridProps) {
   if (works.length === 0) {
     return (
@@ -19,9 +21,15 @@ export function WorkGrid({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+    <div
+      className={
+        variant === "platform"
+          ? "grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 lg:grid-cols-5"
+          : "grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5"
+      }
+    >
       {works.map((work) => (
-        <WorkCard key={work.slug} work={work} />
+        <WorkCard key={work.slug} work={work} variant={variant} />
       ))}
     </div>
   );

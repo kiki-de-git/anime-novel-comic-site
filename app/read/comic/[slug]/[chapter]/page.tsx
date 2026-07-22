@@ -4,15 +4,18 @@ import {
   getChapter,
   getChapterNeighbors,
   getReadHref,
-  getWork,
-  works,
 } from "@/app/lib/mock-data";
+import { getAllWorks, getWorkBySlug } from "@/app/lib/work-data";
 
 type ComicReaderProps = {
   params: Promise<{ slug: string; chapter: string }>;
 };
 
-export function generateStaticParams() {
+export const dynamic = "force-dynamic";
+
+export async function generateStaticParams() {
+  const works = await getAllWorks();
+
   return works
     .filter((work) => work.type === "comic")
     .flatMap((work) =>
@@ -25,7 +28,7 @@ export function generateStaticParams() {
 
 export default async function ComicReaderPage({ params }: ComicReaderProps) {
   const { slug, chapter: chapterSlug } = await params;
-  const work = getWork(slug);
+  const work = await getWorkBySlug(slug);
 
   if (!work || work.type !== "comic") {
     notFound();
@@ -87,7 +90,7 @@ export default async function ComicReaderPage({ params }: ComicReaderProps) {
                   </div>
                 </div>
                 <div className="relative overflow-hidden rounded border-2 border-slate-900 bg-gradient-to-r from-violet-100 via-white to-pink-100">
-                    <div className="absolute left-5 top-4 text-4xl font-black italic text-rose-500 drop-shadow-sm sm:text-6xl">
+                  <div className="absolute left-5 top-4 text-4xl font-black italic text-rose-500 drop-shadow-sm sm:text-6xl">
                     SHINE!
                   </div>
                   <div className="absolute inset-0 bg-[repeating-linear-gradient(105deg,transparent_0_12px,rgba(15,23,42,0.16)_13px_14px)]" />
